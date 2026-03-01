@@ -9,12 +9,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class playerDto {
-    private long pid;
-    private String first_name;
-    private String last_name;
+public class PlayerDto {
+    private Long pid;
+    private String firstName;
+    private String lastName;
     private String position;
     private double height;
     private double weight;
-    private long team_id;
+    private Long teamId;
+    private String teamName;
 }

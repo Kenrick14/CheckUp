@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class teamDto {
-    private long tid;
+public class TeamDto {
+    private Long tid;
     private String name;
     private String conference;
     private String Division;

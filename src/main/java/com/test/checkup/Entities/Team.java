@@ -11,11 +11,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "teams")
-public class team {
+@Table(name = "teams",
+        indexes = {
+                @Index(name = "idx_team_name", columnList = "name")
+        })
+public class Team {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long tid;
+    private Long tid;
     private String name;
     private String conference;
     private String Division;

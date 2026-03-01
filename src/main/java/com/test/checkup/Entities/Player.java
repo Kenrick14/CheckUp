@@ -11,15 +11,20 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "players")
-public class player {
+@Table(name = "players",
+        indexes = {
+                @Index(name = "idx_player_name", columnList = "firstName, lastName")
+        })
+public class Player {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long pid;
-    private String first_name;
-    private String last_name;
+    private Long pid;
+    private String firstName;
+    private String lastName;
     private String position;
     private double height;
     private double weight;
-    private long team_id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "team_id")
+    private Team team;
 }
