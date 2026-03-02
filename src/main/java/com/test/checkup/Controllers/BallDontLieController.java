@@ -1,5 +1,6 @@
 package com.test.checkup.Controllers;
 
+import com.test.checkup.DTO.GameDto;
 import com.test.checkup.DTO.PlayerDto;
 import com.test.checkup.DTO.TeamDto;
 import com.test.checkup.Services.BallDontLieService;
@@ -27,5 +28,11 @@ public class BallDontLieController {
     public ResponseEntity<List<PlayerDto>> getAllPlayers(){
         List<PlayerDto> players = ballDontLieService.getAllPlayers();
         return ResponseEntity.ok(players);
+    }
+
+    @GetMapping(path = "/games")
+    public ResponseEntity<List<GameDto>> getAllGames(){
+        List<GameDto> games = ballDontLieService.getAllGames();
+        return ResponseEntity.ok(games);
     }
 }

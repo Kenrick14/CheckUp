@@ -19,11 +19,11 @@ public class GameMapperImpl implements Mapper<Game, GameDto> {
     @Override
     public GameDto mapTo(Game game) {
         GameDto gameDto = modelMapper.map(game, GameDto.class);
-        gameDto.setHomeTeamId(game.getHomeTeam().getId());
-        gameDto.setHomeTeamName(game.getHomeTeam().getName());
+        gameDto.setHomeTeamId(game.getHome_team().getId());
+        gameDto.setHomeTeamName(game.getHome_team().getFull_name());
 
-        gameDto.setAwayTeamId(game.getAwayteam().getId());
-        gameDto.setAwayTeamName(game.getAwayteam().getName());
+        gameDto.setVisitorTeamId(game.getVisitor_team().getId());
+        gameDto.setVisitorTeamName(game.getVisitor_team().getFull_name());
         return gameDto;
     }
 
@@ -36,11 +36,11 @@ public class GameMapperImpl implements Mapper<Game, GameDto> {
         homeTeam.setId(gameDto.getHomeTeamId());
         homeTeam.setName(gameDto.getHomeTeamName());
 
-        awayTeam.setId(gameDto.getAwayTeamId());
-        awayTeam.setName(gameDto.getAwayTeamName());
+        awayTeam.setId(gameDto.getVisitorTeamId());
+        awayTeam.setName(gameDto.getVisitorTeamName());
 
-        game.setHomeTeam(homeTeam);
-        game.setAwayteam(awayTeam);
+        game.setHome_team(homeTeam);
+        game.setVisitor_team(awayTeam);
 
         return game;
     }

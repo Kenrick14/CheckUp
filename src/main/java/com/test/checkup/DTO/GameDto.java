@@ -12,13 +12,13 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Builder
 public class GameDto {
-    private Long gid;
+    private Long id;
     private Long homeTeamId;
     private String homeTeamName;
-    private Long awayTeamId;
-    private String awayTeamName;
+    private Long visitorTeamId;
+    private String visitorTeamName;
     private LocalDate gameDate;
     private String season;
     private Integer homeTeamScore;
-    private Integer awayTeamScore;
+    private Integer visitorTeamScore;
 }

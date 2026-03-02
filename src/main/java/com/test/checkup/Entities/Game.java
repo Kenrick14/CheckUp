@@ -27,12 +27,12 @@ public class Game {
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "home_team_id")
-    private Team homeTeam;
+    private Team home_team;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "away_team_id")
-    private Team awayteam;
-    private LocalDate gameDate;
+    private Team visitor_team;
+    private LocalDate date;
     private String season;
-    private Integer homeTeamScore;
-    private Integer awayTeamScore;
+    private Integer home_team_score;
+    private Integer visitor_team_score;
 }

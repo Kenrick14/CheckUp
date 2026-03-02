@@ -1,11 +1,14 @@
 package com.test.checkup.Services.Implementation;
 
 import com.test.checkup.Config.BallDontLieConfig;
+import com.test.checkup.DTO.GameDto;
 import com.test.checkup.DTO.PlayerDto;
 import com.test.checkup.DTO.TeamDto;
 import com.test.checkup.Entities.ApiResponse;
+import com.test.checkup.Entities.Game;
 import com.test.checkup.Entities.Player;
 import com.test.checkup.Entities.Team;
+import com.test.checkup.Mappers.Implementation.GameMapperImpl;
 import com.test.checkup.Mappers.Implementation.PlayerMapperImpl;
 import com.test.checkup.Mappers.Implementation.PlayerStatsMapperImpl;
 import com.test.checkup.Mappers.Implementation.TeamMapperImpl;
@@ -30,6 +33,8 @@ public class BallDontLieServiceImpl implements BallDontLieService {
     private TeamMapperImpl teamMapper;
     @Autowired
     private PlayerMapperImpl playerMapper;
+    @Autowired
+    private GameMapperImpl gameMapper;
 
     public List<TeamDto> getAllTeams() {
         String url = ballDontLieConfig.getBaseUrl() + "/teams";
@@ -65,6 +70,23 @@ public class BallDontLieServiceImpl implements BallDontLieService {
         return response.getBody().getData()
                 .stream()
                 .map(playerMapper::mapTo)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<GameDto> getAllGames() {
+        String url = ballDontLieConfig.getBaseUrl() +  "/games?seasons[]=2025&per_page=100";
+
+        ResponseEntity<ApiResponse<Game>> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<ApiResponse<Game>>() {}
+        );
+
+        return response.getBody().getData()
+                .stream()
+                .map(gameMapper::mapTo)
                 .collect(Collectors.toList());
     }
 
