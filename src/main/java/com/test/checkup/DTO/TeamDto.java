@@ -12,7 +12,8 @@ import lombok.NoArgsConstructor;
 public class TeamDto {
     private Long id;
     private String name;
+    private String full_name;
     private String abbreviation;
     private String conference;
-    private String Division;
+    private String division;
 }

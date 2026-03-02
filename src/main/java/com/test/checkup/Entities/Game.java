@@ -1,5 +1,6 @@
 package com.test.checkup.Entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,6 +14,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Entity
 @Builder
+@JsonIgnoreProperties(ignoreUnknown = true) //ignores extra fields
 @Table(name = "games",
         indexes = {
                 @Index(name = "idx_game_date", columnList = "game_date"),
@@ -31,4 +33,6 @@ public class Game {
     private Team awayteam;
     private LocalDate gameDate;
     private String season;
+    private Integer homeTeamScore;
+    private Integer awayTeamScore;
 }

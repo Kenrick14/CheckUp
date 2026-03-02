@@ -8,11 +8,11 @@ import com.test.checkup.Mappers.Mapper;
 import org.springframework.stereotype.Component;
 
 @Component
-public class playerMapperImpl implements Mapper<Player, PlayerDto> {
+public class PlayerMapperImpl implements Mapper<Player, PlayerDto> {
 
     private ModelMapper modelMapper;
 
-    public playerMapperImpl(ModelMapper modelMapper) {
+    public PlayerMapperImpl(ModelMapper modelMapper) {
         this.modelMapper = modelMapper;
     }
 
@@ -21,7 +21,7 @@ public class playerMapperImpl implements Mapper<Player, PlayerDto> {
         PlayerDto playerDto = modelMapper.map(player, PlayerDto.class);
         if(player.getTeam() != null){
             playerDto.setTeamId(player.getTeam().getId());
-            playerDto.setTeamName(player.getTeam().getName());
+            playerDto.setTeamName(player.getTeam().getFull_name());
         }
         return playerDto;
     }

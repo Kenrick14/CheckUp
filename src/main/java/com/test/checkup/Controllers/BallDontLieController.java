@@ -1,5 +1,6 @@
 package com.test.checkup.Controllers;
 
+import com.test.checkup.DTO.PlayerDto;
 import com.test.checkup.DTO.TeamDto;
 import com.test.checkup.Services.BallDontLieService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +17,15 @@ public class BallDontLieController {
     @Autowired
     private BallDontLieService ballDontLieService;
 
-    @GetMapping("/teams")
+    @GetMapping(path = "/teams")
     public ResponseEntity<List<TeamDto>> getAllTeams() {
         List<TeamDto> teams = ballDontLieService.getAllTeams();
         return ResponseEntity.ok(teams);
+    }
+
+    @GetMapping(path = "/players")
+    public ResponseEntity<List<PlayerDto>> getAllPlayers(){
+        List<PlayerDto> players = ballDontLieService.getAllPlayers();
+        return ResponseEntity.ok(players);
     }
 }

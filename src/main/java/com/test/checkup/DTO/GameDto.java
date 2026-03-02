@@ -19,4 +19,6 @@ public class GameDto {
     private String awayTeamName;
     private LocalDate gameDate;
     private String season;
+    private Integer homeTeamScore;
+    private Integer awayTeamScore;
 }

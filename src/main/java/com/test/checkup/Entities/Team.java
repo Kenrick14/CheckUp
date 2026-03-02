@@ -1,5 +1,6 @@
 package com.test.checkup.Entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,7 +22,8 @@ public class Team {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+    private String full_name;
     private String abbreviation;
     private String conference;
-    private String Division;
+    private String division;
 }

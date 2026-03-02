@@ -1,5 +1,6 @@
 package com.test.checkup.Entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,6 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @Entity
+@JsonIgnoreProperties(ignoreUnknown = true) //ignores extra fields
 @Table(name = "player_stats",
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = {"player_id", "game_id"})
