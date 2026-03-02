@@ -20,7 +20,7 @@ public class playerMapperImpl implements Mapper<Player, PlayerDto> {
     public PlayerDto mapTo(Player player) {
         PlayerDto playerDto = modelMapper.map(player, PlayerDto.class);
         if(player.getTeam() != null){
-            playerDto.setTeamId(player.getTeam().getTid());
+            playerDto.setTeamId(player.getTeam().getId());
             playerDto.setTeamName(player.getTeam().getName());
         }
         return playerDto;
@@ -31,7 +31,7 @@ public class playerMapperImpl implements Mapper<Player, PlayerDto> {
         Player player =  modelMapper.map(playerDto, Player.class);
         if(player.getTeam() != null){
             Team team = new Team();
-            team.setTid(playerDto.getTeamId());
+            team.setId(playerDto.getTeamId());
             team.setName(playerDto.getTeamName());
             player.setTeam(team);
         }

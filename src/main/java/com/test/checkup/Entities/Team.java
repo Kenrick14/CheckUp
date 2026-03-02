@@ -13,13 +13,15 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "teams",
         indexes = {
-                @Index(name = "idx_team_name", columnList = "name")
+                @Index(name = "idx_team_name", columnList = "name"),
+                @Index(name = "idx_team_abv", columnList = "abbreviation")
         })
 public class Team {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long tid;
+    private Long id;
     private String name;
+    private String abbreviation;
     private String conference;
     private String Division;
 }

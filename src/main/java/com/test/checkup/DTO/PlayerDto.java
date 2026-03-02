@@ -10,12 +10,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class PlayerDto {
-    private Long pid;
+    private Long id;
     private String firstName;
     private String lastName;
     private String position;
-    private double height;
-    private double weight;
+    private String height;
+    private String weight;
     private Long teamId;
     private String teamName;
 }

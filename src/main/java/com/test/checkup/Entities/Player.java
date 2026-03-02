@@ -18,12 +18,12 @@ import lombok.NoArgsConstructor;
 public class Player {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long pid;
+    private Long id;
     private String firstName;
     private String lastName;
     private String position;
-    private double height;
-    private double weight;
+    private String height;
+    private String weight;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id")
     private Team team;

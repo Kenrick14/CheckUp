@@ -10,8 +10,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class TeamDto {
-    private Long tid;
+    private Long id;
     private String name;
+    private String abbreviation;
     private String conference;
     private String Division;
 }

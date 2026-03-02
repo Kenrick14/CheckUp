@@ -11,6 +11,7 @@ import java.time.LocalDate;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Entity
 @Builder
 @Table(name = "games",
         indexes = {
@@ -21,12 +22,12 @@ public class Game {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long gid;
+    private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "home_team_id")
     private Team homeTeam;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "home_team_id")
+    @JoinColumn(name = "away_team_id")
     private Team awayteam;
     private LocalDate gameDate;
     private String season;
