@@ -3,7 +3,7 @@ target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
-## src/resources/
+src/resources/
 docker-compose.yml
 
 ### STS ###
