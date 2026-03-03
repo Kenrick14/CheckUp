@@ -32,11 +32,11 @@ public class PlayerStats {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "game_id")
     private Game game;
-    private Integer points;
-    private Integer assists;
-    private Integer rebounds;
-    private Integer steals;
-    private Integer blocks;
-    private Integer turnovers;
-    private Integer minutes;
+    private Integer pts;
+    private Integer ast;
+    private Integer reb;
+    private Integer stl;
+    private Integer blk;
+    private Integer turnover;
+    private Integer min;
 }

@@ -3,11 +3,9 @@ package com.test.checkup.Services.Implementation;
 import com.test.checkup.Config.BallDontLieConfig;
 import com.test.checkup.DTO.GameDto;
 import com.test.checkup.DTO.PlayerDto;
+import com.test.checkup.DTO.PlayerStatsDto;
 import com.test.checkup.DTO.TeamDto;
-import com.test.checkup.Entities.ApiResponse;
-import com.test.checkup.Entities.Game;
-import com.test.checkup.Entities.Player;
-import com.test.checkup.Entities.Team;
+import com.test.checkup.Entities.*;
 import com.test.checkup.Mappers.Implementation.GameMapperImpl;
 import com.test.checkup.Mappers.Implementation.PlayerMapperImpl;
 import com.test.checkup.Mappers.Implementation.PlayerStatsMapperImpl;
@@ -35,6 +33,8 @@ public class BallDontLieServiceImpl implements BallDontLieService {
     private PlayerMapperImpl playerMapper;
     @Autowired
     private GameMapperImpl gameMapper;
+    @Autowired
+    private PlayerStatsMapperImpl playerStatsMapper;
 
     public List<TeamDto> getAllTeams() {
         String url = ballDontLieConfig.getBaseUrl() + "/teams";
@@ -58,7 +58,7 @@ public class BallDontLieServiceImpl implements BallDontLieService {
 
     @Override
     public List<PlayerDto> getAllPlayers() {
-        String url = ballDontLieConfig.getBaseUrl() + "/players";
+        String url = ballDontLieConfig.getBaseUrl() + "/players?per_page=100";
 
         ResponseEntity<ApiResponse<Player>> response = restTemplate.exchange(
                 url,
@@ -87,6 +87,23 @@ public class BallDontLieServiceImpl implements BallDontLieService {
         return response.getBody().getData()
                 .stream()
                 .map(gameMapper::mapTo)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<PlayerStatsDto> getAllStats() {
+        String url = ballDontLieConfig.getBaseUrl() + "/stats?seasons[]=2025&per_page=100";
+
+        ResponseEntity<ApiResponse<PlayerStats>> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<ApiResponse<PlayerStats>>() {}
+        );
+
+        return response.getBody().getData()
+                .stream()
+                .map(playerStatsMapper::mapTo)
                 .collect(Collectors.toList());
     }
 

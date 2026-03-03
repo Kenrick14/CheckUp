@@ -22,11 +22,11 @@ public class PlayerStatsDto {
     private LocalDate gameDate;
     private String gameSeason;
 
-    private Integer points;
-    private Integer assists;
-    private Integer rebounds;
-    private Integer steals;
-    private Integer blocks;
-    private Integer turnovers;
-    private double minutes;
+    private Integer pts;
+    private Integer ast;
+    private Integer reb;
+    private Integer stl;
+    private Integer blk;
+    private Integer turnover;
+    private Integer min;
 }
