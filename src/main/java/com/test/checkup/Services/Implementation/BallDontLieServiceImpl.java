@@ -10,6 +10,7 @@ import com.test.checkup.Mappers.Implementation.GameMapperImpl;
 import com.test.checkup.Mappers.Implementation.PlayerMapperImpl;
 import com.test.checkup.Mappers.Implementation.PlayerStatsMapperImpl;
 import com.test.checkup.Mappers.Implementation.TeamMapperImpl;
+import com.test.checkup.Repositories.TeamRepository;
 import com.test.checkup.Services.BallDontLieService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
@@ -35,6 +36,8 @@ public class BallDontLieServiceImpl implements BallDontLieService {
     private GameMapperImpl gameMapper;
     @Autowired
     private PlayerStatsMapperImpl playerStatsMapper;
+    @Autowired
+    private TeamRepository teamRepository;
 
     public List<TeamDto> getAllTeams() {
         String url = ballDontLieConfig.getBaseUrl() + "/teams";
@@ -105,6 +108,16 @@ public class BallDontLieServiceImpl implements BallDontLieService {
                 .stream()
                 .map(playerStatsMapper::mapTo)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<TeamDto> getAndSaveTeams() {
+        List<TeamDto> teams = getAllTeams();
+
+        teams.stream()
+                .map(teamMapper::mapFrom)
+                .forEach(teamRepository::save);
+        return teams;
     }
 
 }

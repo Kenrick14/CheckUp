@@ -15,4 +15,6 @@ public interface BallDontLieService {
     List<GameDto> getAllGames();
 
     List<PlayerStatsDto> getAllStats();
+
+    List<TeamDto> getAndSaveTeams();
 }

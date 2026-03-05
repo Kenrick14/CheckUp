@@ -6,8 +6,10 @@ import com.test.checkup.DTO.PlayerStatsDto;
 import com.test.checkup.DTO.TeamDto;
 import com.test.checkup.Services.BallDontLieService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,6 +26,12 @@ public class BallDontLieController {
         List<TeamDto> teams = ballDontLieService.getAllTeams();
         return ResponseEntity.ok(teams);
     }
+    @PostMapping(path = "/teams")
+    public ResponseEntity<List<TeamDto>> getAndSaveTeams(){
+        List<TeamDto> teams = ballDontLieService.getAndSaveTeams();
+        return ResponseEntity.status(HttpStatus.CREATED).body(teams);
+    }
+
 
     @GetMapping(path = "/players")
     public ResponseEntity<List<PlayerDto>> getAllPlayers(){
@@ -42,4 +50,5 @@ public class BallDontLieController {
         List<PlayerStatsDto> stats = ballDontLieService.getAllStats();
         return ResponseEntity.ok(stats);
     }
+
 }
