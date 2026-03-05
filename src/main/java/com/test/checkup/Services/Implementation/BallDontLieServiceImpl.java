@@ -10,6 +10,7 @@ import com.test.checkup.Mappers.Implementation.GameMapperImpl;
 import com.test.checkup.Mappers.Implementation.PlayerMapperImpl;
 import com.test.checkup.Mappers.Implementation.PlayerStatsMapperImpl;
 import com.test.checkup.Mappers.Implementation.TeamMapperImpl;
+import com.test.checkup.Repositories.PlayerRepository;
 import com.test.checkup.Repositories.TeamRepository;
 import com.test.checkup.Services.BallDontLieService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,6 +40,8 @@ public class BallDontLieServiceImpl implements BallDontLieService {
     private PlayerStatsMapperImpl playerStatsMapper;
     @Autowired
     private TeamRepository teamRepository;
+    @Autowired
+    private PlayerRepository playerRepository;
 
     public List<TeamDto> getAllTeams() {
         String url = ballDontLieConfig.getBaseUrl() + "/teams";
@@ -61,17 +65,31 @@ public class BallDontLieServiceImpl implements BallDontLieService {
 
     @Override
     public List<PlayerDto> getAllPlayers() {
-        String url = ballDontLieConfig.getBaseUrl() + "/players?per_page=100";
+        List<Player> allPlayers = new ArrayList<>();
+        Long cursor = null;
 
-        ResponseEntity<ApiResponse<Player>> response = restTemplate.exchange(
-                url,
-                HttpMethod.GET,
-                null,
-                new ParameterizedTypeReference<ApiResponse<Player>>() {}
-        );
+        do {
+            String url = ballDontLieConfig.getBaseUrl() + "/players/active?per_page=100&";
+            if (cursor != null) {
+                url += "&cursor=" + cursor;
+            }
 
-        return response.getBody().getData()
-                .stream()
+            ResponseEntity<ApiResponse<Player>> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    null,
+                    new ParameterizedTypeReference<ApiResponse<Player>>() {
+                    }
+            );
+
+            ApiResponse<Player> body = response.getBody();
+            allPlayers.addAll(body.getData());
+            cursor = (body.getMeta() != null) ? body.getMeta().getNext_cursor() : null;
+
+        }while (cursor != null) ;
+
+
+        return allPlayers.stream()
                 .map(playerMapper::mapTo)
                 .collect(Collectors.toList());
     }
@@ -110,6 +128,7 @@ public class BallDontLieServiceImpl implements BallDontLieService {
                 .collect(Collectors.toList());
     }
 
+    //Adding Data to Database
     @Override
     public List<TeamDto> getAndSaveTeams() {
         List<TeamDto> teams = getAllTeams();
@@ -118,6 +137,18 @@ public class BallDontLieServiceImpl implements BallDontLieService {
                 .map(teamMapper::mapFrom)
                 .forEach(teamRepository::save);
         return teams;
+    }
+
+    @Override
+    public List<PlayerDto> getAndSavePlayers() {
+        List<PlayerDto> players = getAllPlayers();
+
+        List<Player> playerEntities = players.stream()
+                .map(playerMapper::mapFrom)
+                .filter(player -> !playerRepository.existsById(player.getId()))
+                .collect(Collectors.toList());
+        playerRepository.saveAll(playerEntities);
+        return players;
     }
 
 }
