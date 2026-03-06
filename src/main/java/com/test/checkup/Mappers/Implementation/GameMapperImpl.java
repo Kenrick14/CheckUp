@@ -18,18 +18,27 @@ public class GameMapperImpl implements Mapper<Game, GameDto> {
 
     @Override
     public GameDto mapTo(Game game) {
-        GameDto gameDto = modelMapper.map(game, GameDto.class);
+        GameDto gameDto = new GameDto();
+
+        gameDto.setId(game.getId());
         gameDto.setHomeTeamId(game.getHome_team().getId());
         gameDto.setHomeTeamName(game.getHome_team().getFull_name());
+        gameDto.setHomeTeamScore(game.getHome_team_score());
 
         gameDto.setVisitorTeamId(game.getVisitor_team().getId());
         gameDto.setVisitorTeamName(game.getVisitor_team().getFull_name());
+        gameDto.setVisitorTeamScore(game.getVisitor_team_score());
+
+        gameDto.setGameDate(game.getDate());
+        gameDto.setSeason(game.getSeason());
+        gameDto.setStatus(game.getStatus());
+
         return gameDto;
     }
 
     @Override
     public Game mapFrom(GameDto gameDto) {
-        Game game = modelMapper.map(gameDto, Game.class);
+        Game game = new Game();
         Team homeTeam = new Team();
         Team awayTeam = new Team();
 
@@ -39,8 +48,15 @@ public class GameMapperImpl implements Mapper<Game, GameDto> {
         awayTeam.setId(gameDto.getVisitorTeamId());
         awayTeam.setName(gameDto.getVisitorTeamName());
 
+        game.setId(gameDto.getId());
+        game.setDate(gameDto.getGameDate());
+        game.setSeason(gameDto.getSeason());
+        game.setStatus(gameDto.getStatus());
+        game.setHome_team_score(gameDto.getHomeTeamScore());
+        game.setVisitor_team_score(gameDto.getVisitorTeamScore());
         game.setHome_team(homeTeam);
         game.setVisitor_team(awayTeam);
+
 
         return game;
     }

@@ -44,10 +44,16 @@ public class BallDontLieController {
         return ResponseEntity.status(HttpStatus.CREATED).body(players);
     }
 
+
     @GetMapping(path = "/games")
     public ResponseEntity<List<GameDto>> getAllGames(){
         List<GameDto> games = ballDontLieService.getAllGames();
         return ResponseEntity.ok(games);
+    }
+    @PostMapping(path = "/games")
+    public ResponseEntity<List<GameDto>> getAndSaveGames(){
+        List<GameDto> games = ballDontLieService.getAndSaveGames();
+        return ResponseEntity.status(HttpStatus.CREATED).body(games);
     }
 
     @GetMapping(path = "/stats")

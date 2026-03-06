@@ -34,4 +34,5 @@ public class Game {
     private String season;
     private Integer home_team_score;
     private Integer visitor_team_score;
+    private String status;
 }

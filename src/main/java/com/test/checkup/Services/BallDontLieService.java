@@ -19,4 +19,6 @@ public interface BallDontLieService {
     List<TeamDto> getAndSaveTeams();
 
     List<PlayerDto> getAndSavePlayers();
+
+    List<GameDto> getAndSaveGames();
 }

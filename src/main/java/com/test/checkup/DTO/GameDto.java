@@ -21,4 +21,5 @@ public class GameDto {
     private String season;
     private Integer homeTeamScore;
     private Integer visitorTeamScore;
+    private String status;
 }
