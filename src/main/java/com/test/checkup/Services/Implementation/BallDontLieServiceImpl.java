@@ -12,6 +12,7 @@ import com.test.checkup.Mappers.Implementation.PlayerStatsMapperImpl;
 import com.test.checkup.Mappers.Implementation.TeamMapperImpl;
 import com.test.checkup.Repositories.GameRepository;
 import com.test.checkup.Repositories.PlayerRepository;
+import com.test.checkup.Repositories.PlayerStatsRepository;
 import com.test.checkup.Repositories.TeamRepository;
 import com.test.checkup.Services.BallDontLieService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,8 @@ public class BallDontLieServiceImpl implements BallDontLieService {
     private PlayerRepository playerRepository;
     @Autowired
     private GameRepository gameRepository;
+    @Autowired
+    private PlayerStatsRepository playerStatsRepository;
 
     public List<TeamDto> getAllTeams() {
         String url = ballDontLieConfig.getBaseUrl() + "/teams";
@@ -122,6 +125,7 @@ public class BallDontLieServiceImpl implements BallDontLieService {
                     .forEach(allGames::add);
 
             cursor = (body.getMeta() != null) ? body.getMeta().getNext_cursor() : null;
+
         }while(cursor != null);
 
         return allGames.stream()
@@ -131,16 +135,45 @@ public class BallDontLieServiceImpl implements BallDontLieService {
 
     @Override
     public List<PlayerStatsDto> getAllStats() {
-        String url = ballDontLieConfig.getBaseUrl() + "/stats?seasons[]=2025&per_page=100";
+        List<PlayerStats> allStats = new ArrayList<>();
+        Long cursor = null;
+        int requestCount = 0;
 
-        ResponseEntity<ApiResponse<PlayerStats>> response = restTemplate.exchange(
-                url,
-                HttpMethod.GET,
-                null,
-                new ParameterizedTypeReference<ApiResponse<PlayerStats>>() {}
-        );
+        do {
+            // pause every 55 requests to stay under the request limit
+            if (requestCount > 0 && requestCount % 55 == 0) {
+                try {
+                    System.out.println("Approaching request limit, pausing for 60 seconds...");
+                    Thread.sleep(60000);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
 
-        return response.getBody().getData()
+            String url = ballDontLieConfig.getBaseUrl() + "/stats?seasons[]=2025&per_page=100";
+            if(cursor != null){
+                url += "&cursor=" + cursor;
+            }
+
+            ResponseEntity<ApiResponse<PlayerStats>> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    null,
+                    new ParameterizedTypeReference<ApiResponse<PlayerStats>>() {
+                    }
+            );
+            ApiResponse<PlayerStats> body = response.getBody();
+            body.getData()
+                    .stream()
+                    .filter(playerStats -> "Final".equals(playerStats.getGame().getStatus()))
+                    .forEach(allStats::add);
+
+            cursor = (body.getMeta() != null) ? body.getMeta().getNext_cursor() : null;
+            requestCount++;
+
+        }while(cursor != null);
+
+        return allStats
                 .stream()
                 .map(playerStatsMapper::mapTo)
                 .collect(Collectors.toList());
@@ -179,6 +212,18 @@ public class BallDontLieServiceImpl implements BallDontLieService {
                 .collect(Collectors.toList());
         gameRepository.saveAll(gameEntities);
         return games;
+    }
+
+    @Override
+    public List<PlayerStatsDto> getAndSaveStats() {
+        List<PlayerStatsDto> stats = getAllStats();
+
+        List<PlayerStats> statsEntities = stats.stream()
+                .map(playerStatsMapper::mapFrom)
+                .filter(playerStats -> !playerStatsRepository.existsById((playerStats.getId())))
+                .collect(Collectors.toList());
+        playerStatsRepository.saveAll(statsEntities);
+        return stats;
     }
 
 }

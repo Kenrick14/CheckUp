@@ -20,23 +20,35 @@ public class PlayerStatsMapperImpl implements Mapper<PlayerStats, PlayerStatsDto
 
     @Override
     public PlayerStatsDto mapTo(PlayerStats playerStats) {
-        PlayerStatsDto playerStatsDto = modelMapper.map(playerStats, PlayerStatsDto.class);
+        PlayerStatsDto playerStatsDto = new PlayerStatsDto();
+
+        playerStatsDto.setId(playerStats.getId());
+
         playerStatsDto.setPlayerId(playerStats.getId());
         playerStatsDto.setPlayerFirstName(playerStats.getPlayer().getFirst_name());
         playerStatsDto.setPlayerLastName(playerStats.getPlayer().getLast_name());
 
         playerStatsDto.setGameId(playerStats.getGame().getId());
-        playerStatsDto.setGameDate(playerStatsDto.getGameDate());
+        playerStatsDto.setGameDate(playerStats.getGame().getDate());
         playerStatsDto.setGameSeason(playerStats.getGame().getSeason());
+
+        playerStatsDto.setPts(playerStats.getPts());
+        playerStatsDto.setAst(playerStats.getAst());
+        playerStatsDto.setReb(playerStats.getReb());
+        playerStatsDto.setStl(playerStats.getStl());
+        playerStatsDto.setBlk(playerStats.getBlk());
+        playerStatsDto.setTurnover(playerStats.getTurnover());
+        playerStatsDto.setMin(playerStats.getMin());
 
         return playerStatsDto;
     }
 
     @Override
     public PlayerStats mapFrom(PlayerStatsDto playerStatsDto) {
-        PlayerStats playerStats = modelMapper.map(playerStatsDto, PlayerStats.class);
+        PlayerStats playerStats = new PlayerStats();
         Player player = new Player();
         Game game = new Game();
+
 
         player.setId(playerStatsDto.getPlayerId());
         player.setFirst_name(playerStatsDto.getPlayerFirstName());
@@ -45,6 +57,14 @@ public class PlayerStatsMapperImpl implements Mapper<PlayerStats, PlayerStatsDto
         game.setDate(playerStatsDto.getGameDate());
         game.setSeason(playerStatsDto.getGameSeason());
 
+        playerStats.setId(playerStatsDto.getId());
+        playerStats.setPts(playerStatsDto.getPts());
+        playerStats.setAst(playerStatsDto.getAst());
+        playerStats.setReb(playerStatsDto.getReb());
+        playerStats.setStl(playerStatsDto.getStl());
+        playerStats.setBlk(playerStatsDto.getBlk());
+        playerStats.setTurnover(playerStatsDto.getTurnover());
+        playerStats.setMin(playerStatsDto.getMin());
         playerStats.setPlayer(player);
         playerStats.setGame(game);
 
