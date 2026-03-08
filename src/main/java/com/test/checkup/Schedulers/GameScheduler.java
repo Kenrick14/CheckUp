@@ -3,9 +3,7 @@ package com.test.checkup.Schedulers;
 import com.test.checkup.Config.BallDontLieConfig;
 import com.test.checkup.Entities.ApiResponse;
 import com.test.checkup.Entities.Game;
-import com.test.checkup.Mappers.Implementation.GameMapperImpl;
 import com.test.checkup.Repositories.GameRepository;
-import com.test.checkup.Services.BallDontLieService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -21,9 +19,6 @@ import java.util.stream.Collectors;
 @Component
 public class GameScheduler {
     @Autowired
-    private BallDontLieService ballDontLieService;
-
-    @Autowired
     private GameRepository gameRepository;
 
     @Autowired
@@ -32,8 +27,6 @@ public class GameScheduler {
     @Autowired
     private BallDontLieConfig ballDontLieConfig;
 
-    @Autowired
-    private GameMapperImpl gameMapper;
 
     // runs every day at 2 AM
     @Scheduled(cron = "0 0 2 * * *")

@@ -220,7 +220,17 @@ public class BallDontLieServiceImpl implements BallDontLieService {
 
         List<PlayerStats> statsEntities = stats.stream()
                 .map(playerStatsMapper::mapFrom)
+                .filter(playerStats -> playerStats.getId() != null)
                 .filter(playerStats -> !playerStatsRepository.existsById((playerStats.getId())))
+                .map(playerStats -> {
+                    // fetch the actual managed Game entity from DB
+                    Game managedGame = gameRepository.findById(playerStats.getGame().getId())
+                            .orElse(null);
+                    if (managedGame == null) return null; // skip if game not in DB
+                    playerStats.setGame(managedGame);
+                    return playerStats;
+                })
+                .filter(playerStats -> playerStats != null) // remove any stats whose game wasn't found
                 .collect(Collectors.toList());
         playerStatsRepository.saveAll(statsEntities);
         return stats;
