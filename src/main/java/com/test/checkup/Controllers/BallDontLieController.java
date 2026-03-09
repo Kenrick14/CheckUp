@@ -4,7 +4,6 @@ import com.test.checkup.DTO.GameDto;
 import com.test.checkup.DTO.PlayerDto;
 import com.test.checkup.DTO.PlayerStatsDto;
 import com.test.checkup.DTO.TeamDto;
-import com.test.checkup.Entities.PlayerStats;
 import com.test.checkup.Services.BallDontLieService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

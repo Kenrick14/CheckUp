@@ -24,6 +24,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -220,17 +221,14 @@ public class BallDontLieServiceImpl implements BallDontLieService {
 
         List<PlayerStats> statsEntities = stats.stream()
                 .map(playerStatsMapper::mapFrom)
-                .filter(playerStats -> playerStats.getId() != null)
-                .filter(playerStats -> !playerStatsRepository.existsById((playerStats.getId())))
                 .map(playerStats -> {
-                    // fetch the actual managed Game entity from DB
-                    Game managedGame = gameRepository.findById(playerStats.getGame().getId())
+                    Game matchedGame = gameRepository.findById(playerStats.getGame().getId())
                             .orElse(null);
-                    if (managedGame == null) return null; // skip if game not in DB
-                    playerStats.setGame(managedGame);
+                    if (matchedGame == null) return null;
+                    playerStats.setGame(matchedGame);
                     return playerStats;
-                })
-                .filter(playerStats -> playerStats != null) // remove any stats whose game wasn't found
+                }).filter(Objects::nonNull)
+                .filter(playerStats -> !playerStatsRepository.existsById((playerStats.getId())))
                 .collect(Collectors.toList());
         playerStatsRepository.saveAll(statsEntities);
         return stats;

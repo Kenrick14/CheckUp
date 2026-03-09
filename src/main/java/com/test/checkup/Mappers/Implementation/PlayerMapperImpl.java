@@ -21,7 +21,7 @@ public class PlayerMapperImpl implements Mapper<Player, PlayerDto> {
         PlayerDto playerDto = modelMapper.map(player, PlayerDto.class);
         if(player.getTeam() != null){
             playerDto.setTeamId(player.getTeam().getId());
-            playerDto.setTeamName(player.getTeam().getFull_name());
+            playerDto.setTeamName(player.getTeam().getFullName());
         }
         return playerDto;
     }

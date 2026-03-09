@@ -1,6 +1,7 @@
 package com.test.checkup.Entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,6 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @Entity
+@JsonIgnoreProperties(ignoreUnknown = true) //ignores extra fields
 @Table(name = "teams",
         indexes = {
                 @Index(name = "idx_team_name", columnList = "name"),
@@ -21,7 +23,8 @@ public class Team {
     @Id
     private Long id;
     private String name;
-    private String full_name;
+    @JsonProperty("full_name")
+    private String fullName;
     private String abbreviation;
     private String conference;
     private String division;
