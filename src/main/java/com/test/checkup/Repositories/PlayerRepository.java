@@ -14,4 +14,7 @@ public interface PlayerRepository extends JpaRepository<Player, Long>,
 
     @Query("SELECT p FROM Player p WHERE LOWER(p.firstName) LIKE LOWER(CONCAT('%', :name, '%')) OR LOWER(p.lastName) LIKE LOWER(CONCAT('%', :name, '%'))")
     List<Player> findByNameContaining(String name);
+
+    @Query("SELECT p.id FROM Player p")
+    List<Long> findAllPlayerIds();
 }

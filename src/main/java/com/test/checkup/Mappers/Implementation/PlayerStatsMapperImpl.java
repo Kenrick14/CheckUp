@@ -24,7 +24,7 @@ public class PlayerStatsMapperImpl implements Mapper<PlayerStats, PlayerStatsDto
 
         playerStatsDto.setId(playerStats.getId());
 
-        playerStatsDto.setPlayerId(playerStats.getId());
+        playerStatsDto.setPlayerId(playerStats.getPlayer().getId());
         playerStatsDto.setPlayerFirstName(playerStats.getPlayer().getFirstName());
         playerStatsDto.setPlayerLastName(playerStats.getPlayer().getLastName());
 
@@ -54,7 +54,7 @@ public class PlayerStatsMapperImpl implements Mapper<PlayerStats, PlayerStatsDto
         player.setFirstName(playerStatsDto.getPlayerFirstName());
         player.setLastName(playerStatsDto.getPlayerLastName());
 
-        game.setId(playerStatsDto.getId());
+        game.setId(playerStatsDto.getGameId());
         game.setDate(playerStatsDto.getGameDate());
         game.setSeason(playerStatsDto.getGameSeason());
 

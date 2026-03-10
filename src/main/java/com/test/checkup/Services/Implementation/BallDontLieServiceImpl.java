@@ -22,9 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -63,6 +61,7 @@ public class BallDontLieServiceImpl implements BallDontLieService {
                 "Atlantic", "Central", "Southeast",
                 "Northwest", "Pacific", "Southwest"
         );
+        assert response.getBody() != null;
         return response.getBody().getData()
                 .stream()
                 .filter(team -> nbaDivisions.contains(team.getDivision())) //filter out just nba teams
@@ -120,6 +119,7 @@ public class BallDontLieServiceImpl implements BallDontLieService {
             );
 
             ApiResponse<Game> body = response.getBody();
+            assert body != null;
             body.getData()
                     .stream()
                     .filter(game -> "Final".equals(game.getStatus()))
@@ -164,6 +164,7 @@ public class BallDontLieServiceImpl implements BallDontLieService {
                     }
             );
             ApiResponse<PlayerStats> body = response.getBody();
+            assert body != null;
             body.getData()
                     .stream()
                     .filter(playerStats -> "Final".equals(playerStats.getGame().getStatus()))
@@ -219,17 +220,19 @@ public class BallDontLieServiceImpl implements BallDontLieService {
     public List<PlayerStatsDto> getAndSaveStats() {
         List<PlayerStatsDto> stats = getAllStats();
 
+        Set<Long> playerIds = new HashSet<>(playerRepository.findAllPlayerIds());
+        Set<Long> gameIds = new HashSet<>(gameRepository.findAllGameIds());
+        Set<Long> existingStatsIds = new HashSet<>(playerStatsRepository.findAllStatsIds());
+
         List<PlayerStats> statsEntities = stats.stream()
                 .map(playerStatsMapper::mapFrom)
-                .map(playerStats -> {
-                    Game matchedGame = gameRepository.findById(playerStats.getGame().getId())
-                            .orElse(null);
-                    if (matchedGame == null) return null;
-                    playerStats.setGame(matchedGame);
-                    return playerStats;
-                }).filter(Objects::nonNull)
-                .filter(playerStats -> !playerStatsRepository.existsById((playerStats.getId())))
+                .filter(stat -> playerIds.contains(stat.getPlayer().getId()))
+                .filter(stat -> gameIds.contains(stat.getGame().getId()))
+                .filter(stat -> !existingStatsIds.contains(stat.getId()))
                 .collect(Collectors.toList());
+
+        System.out.println("Stats to save: " + statsEntities.size());
+
         playerStatsRepository.saveAll(statsEntities);
         return stats;
     }

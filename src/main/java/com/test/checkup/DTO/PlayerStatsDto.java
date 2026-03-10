@@ -20,7 +20,7 @@ public class PlayerStatsDto {
 
     private Long gameId;
     private LocalDate gameDate;
-    private String gameSeason;
+    private Integer gameSeason;
 
     private Integer pts;
     private Integer ast;

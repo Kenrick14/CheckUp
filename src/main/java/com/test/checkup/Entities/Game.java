@@ -34,7 +34,7 @@ public class Game {
     @JsonProperty("visitor_team")
     private Team visitorTeam;
     private LocalDate date;
-    private String season;
+    private Integer season;
     @JsonProperty("home_team_score")
     private Integer homeTeamScore;
     @JsonProperty("visitor_team_score")

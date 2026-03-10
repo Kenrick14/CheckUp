@@ -18,7 +18,7 @@ public class GameDto {
     private Long visitorTeamId;
     private String visitorTeamName;
     private LocalDate gameDate;
-    private String season;
+    private Integer season;
     private Integer homeTeamScore;
     private Integer visitorTeamScore;
     private String status;
