@@ -1,6 +1,7 @@
 package com.test.checkup.Controllers;
 
 import com.test.checkup.DTO.PlayerDto;
+import com.test.checkup.DTO.PlayerSeasonAveragesDto;
 import com.test.checkup.Entities.Player;
 import com.test.checkup.Mappers.Mapper;
 import com.test.checkup.Services.PlayerService;
@@ -30,9 +31,16 @@ public class PlayerController {
         return players.map(playerMapper::mapTo);
     }
 
-    @GetMapping(path = "/players/{name}")
-    public ResponseEntity<List<Player>> findPlayer(@PathVariable("name") String name){
+    @GetMapping(path = "/players/search")
+    public ResponseEntity<List<Player>> findPlayer(@RequestParam String name){
         List<Player> players = playerService.findByNameContaining(name);
         return ResponseEntity.ok(players);
+    }
+
+    @GetMapping(path = "/players/stats/{id}")
+    public ResponseEntity<PlayerSeasonAveragesDto> getSeasonAvg(@PathVariable("id") Long id){
+        return playerService.playerSeasonAverages(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 }
