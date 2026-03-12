@@ -36,4 +36,7 @@ public interface PlayerStatsRepository extends JpaRepository<PlayerStats, Long> 
             "AND ps.min > 0 " +
             "GROUP BY ps.player.id, ps.player.firstName, ps.player.lastName, ps.player.position, ps.player.team.name")
     Optional<PlayerSeasonAveragesDto> getSeasonAvg(@Param("id") Long id);
+
+    @Query("SELECT ps FROM PlayerStats ps WHERE ps.player.id = :id ORDER BY ps.game.date DESC LIMIT 1")
+    Optional<PlayerStats> findMostRecentByPlayerId(@Param("id") Long id);
 }

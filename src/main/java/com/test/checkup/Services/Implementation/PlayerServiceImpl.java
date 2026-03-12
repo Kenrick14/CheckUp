@@ -2,6 +2,7 @@ package com.test.checkup.Services.Implementation;
 
 import com.test.checkup.DTO.PlayerSeasonAveragesDto;
 import com.test.checkup.Entities.Player;
+import com.test.checkup.Entities.PlayerStats;
 import com.test.checkup.Repositories.PlayerRepository;
 import com.test.checkup.Repositories.PlayerStatsRepository;
 import com.test.checkup.Services.PlayerService;
@@ -37,6 +38,11 @@ public class PlayerServiceImpl implements PlayerService {
     @Override
     public Optional<PlayerSeasonAveragesDto> playerSeasonAverages(Long id) {
         return playerStatsRepository.getSeasonAvg(id);
+    }
+
+    @Override
+    public Optional<PlayerStats> findMostRecentByPlayerId(Long id) {
+        return playerStatsRepository.findMostRecentByPlayerId(id);
     }
 
 
