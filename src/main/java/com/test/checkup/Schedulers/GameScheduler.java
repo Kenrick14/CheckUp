@@ -13,7 +13,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -28,14 +31,13 @@ public class GameScheduler {
     private BallDontLieConfig ballDontLieConfig;
 
 
-    // runs every day at 2 AM
-    @Scheduled(cron = "0 0 2 * * *")
+    @Scheduled(cron = "0 5 2 * * *")
     public void fetchYesterdaysGames() {
         String yesterday = LocalDate.now().minusDays(1).toString();
         System.out.println("Fetching games for: " + yesterday);
 
         String url = ballDontLieConfig.getBaseUrl()
-                + "/games?dates[]=" + yesterday + "&per_page=100";
+                + "/games?seasons[]=2025&dates[]=" + yesterday + "&per_page=100";
 
         ResponseEntity<ApiResponse<Game>> response = restTemplate.exchange(
                 url,
@@ -44,13 +46,18 @@ public class GameScheduler {
                 new ParameterizedTypeReference<ApiResponse<Game>>() {}
         );
 
-        List<Game> games = response.getBody().getData()
+        ApiResponse<Game> body = response.getBody();
+        assert body != null;
+
+        Set<Long> existingGameIds =new HashSet<>( gameRepository.findAllGameIds());
+
+        List<Game> newGames = body.getData()
                 .stream()
                 .filter(game -> "Final".equals(game.getStatus()))
-                .filter(game -> !gameRepository.existsById(game.getId()))
+                .filter(game -> !existingGameIds.contains(game.getId()))
                 .collect(Collectors.toList());
 
-        gameRepository.saveAll(games);
-        System.out.println("Saved " + games.size() + " new games for " + yesterday);
+        gameRepository.saveAll(newGames);
+        System.out.println("Saved " + newGames.size() + " new games for " + yesterday);
     }
 }
