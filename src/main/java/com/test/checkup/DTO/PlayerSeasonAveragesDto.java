@@ -23,4 +23,9 @@ public class PlayerSeasonAveragesDto {
     private Double avgBlocks;
     private Double avgTurnovers;
     private Double avgMinutes;
+
+    private Double fgPercentage;
+    private Double tpPercentage;
+    private Double ftPercentage;
+    private Long plusMinus;
 }

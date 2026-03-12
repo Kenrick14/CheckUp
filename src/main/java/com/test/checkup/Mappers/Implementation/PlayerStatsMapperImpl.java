@@ -40,6 +40,14 @@ public class PlayerStatsMapperImpl implements Mapper<PlayerStats, PlayerStatsDto
         playerStatsDto.setTurnover(playerStats.getTurnover());
         playerStatsDto.setMin(playerStats.getMin());
 
+        playerStatsDto.setFga(playerStats.getFga());
+        playerStatsDto.setFgm(playerStats.getFgm());
+        playerStatsDto.setTpa(playerStats.getTpa());
+        playerStatsDto.setTpm(playerStats.getTpm());
+        playerStatsDto.setFta(playerStats.getFta());
+        playerStatsDto.setFtm(playerStats.getFtm());
+        playerStatsDto.setPm(playerStats.getPm());
+
         return playerStatsDto;
     }
 
@@ -66,6 +74,15 @@ public class PlayerStatsMapperImpl implements Mapper<PlayerStats, PlayerStatsDto
         playerStats.setBlk(playerStatsDto.getBlk());
         playerStats.setTurnover(playerStatsDto.getTurnover());
         playerStats.setMin(playerStatsDto.getMin());
+
+        playerStats.setFga(playerStatsDto.getFga());
+        playerStats.setFgm(playerStatsDto.getFgm());
+        playerStats.setTpa(playerStatsDto.getTpa());
+        playerStats.setTpm(playerStatsDto.getTpm());
+        playerStats.setFta(playerStatsDto.getFta());
+        playerStats.setFtm(playerStatsDto.getFtm());
+        playerStats.setPm(playerStatsDto.getPm());
+
         playerStats.setPlayer(player);
         playerStats.setGame(game);
 

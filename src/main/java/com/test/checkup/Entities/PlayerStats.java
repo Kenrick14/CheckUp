@@ -1,6 +1,7 @@
 package com.test.checkup.Entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -38,4 +39,15 @@ public class PlayerStats {
     private Integer blk;
     private Integer turnover;
     private Integer min;
+
+    private Integer fga;
+    private Integer fgm;
+    @JsonProperty("fg3a")
+    private Integer tpa;
+    @JsonProperty("fg3m")
+    private Integer tpm;
+    private Integer fta;
+    private Integer ftm;
+    @JsonProperty("plus_minus")
+    private Integer pm;
 }

@@ -1,5 +1,6 @@
 package com.test.checkup.DTO;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -29,4 +30,12 @@ public class PlayerStatsDto {
     private Integer blk;
     private Integer turnover;
     private Integer min;
+
+    private Integer fga;
+    private Integer fgm;
+    private Integer tpa;
+    private Integer tpm;
+    private Integer fta;
+    private Integer ftm;
+    private Integer pm;
 }
