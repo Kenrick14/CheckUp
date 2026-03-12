@@ -7,3 +7,11 @@ export const playerSearch = async (name) => {
         params: { name }  // adds ?name=xxx to the URL
     });
 }
+
+export const seasonPlayerStats = async (playerId) => {
+    return await axios.get(`${BASE_API_URL}players/stats/${playerId}`);
+}
+
+export const recentPlayerStats = async (playerId) => {
+    return await axios.get(`${BASE_API_URL}players/stats/recent/${playerId}`);
+}
