@@ -8,12 +8,10 @@ import com.test.checkup.Mappers.Mapper;
 import com.test.checkup.Services.PlayerService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @CrossOrigin("*")
 @RestController
@@ -51,5 +49,11 @@ public class PlayerController {
         return playerService.findMostRecentByPlayerId(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping(path = "/players/stats")
+    public ResponseEntity<Page<PlayerSeasonAveragesDto>> getAllSeasonAverages(Pageable pageable) {
+        Page<PlayerSeasonAveragesDto> allSeasonAverages = playerService.allPlayerSeasonAverages(pageable);
+        return ResponseEntity.ok(allSeasonAverages);
     }
 }

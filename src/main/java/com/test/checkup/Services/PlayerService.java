@@ -18,4 +18,6 @@ public interface PlayerService {
     Optional<PlayerSeasonAveragesDto> playerSeasonAverages(Long id);
 
     Optional<PlayerStats> findMostRecentByPlayerId(Long id);
+
+    Page<PlayerSeasonAveragesDto> allPlayerSeasonAverages(Pageable pageable);
 }
