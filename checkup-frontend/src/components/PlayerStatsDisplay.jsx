@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { seasonPlayerStats, recentPlayerStats } from '../services/PlayerService';
 
-function PlayerStatsDisplay({ playerId }) {
+function PlayerStatsDisplay({ playerId, onRemove, onStatsLoaded, comparisonStats }) {
   const [seasonAvg, setSeasonAvg] = useState(null);
   const [recentGame, setRecentGame] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -17,12 +17,29 @@ function PlayerStatsDisplay({ playerId }) {
       ]);
       setSeasonAvg(avgRes.data);
       setRecentGame(recentRes.data);
+      onStatsLoaded(avgRes.data); // notify SearchBox that stats are loaded
     } catch (err) {
       setError('Failed to load player data');
       console.error(err);
     } finally {
       setLoading(false);
     }
+  };
+
+   // compare this player's stat against the other player's stat
+  const getHighlight = (statKey, higherIsBetter = true) => {
+    const otherStats = Object.entries(comparisonStats)
+        .find(([id]) => Number(id) !== playerId)?.[1];
+
+    if (!otherStats || !seasonAvg) return {};
+
+    const myValue = seasonAvg[statKey];
+    const otherValue = otherStats[statKey];
+
+    if (myValue === otherValue) return {};
+
+    const isBetter = higherIsBetter ? myValue > otherValue : myValue < otherValue;
+    return { backgroundColor: isBetter ? '#d4edda' : '#f8d7da' };
   };
 
   useEffect(() => {
@@ -43,16 +60,24 @@ function PlayerStatsDisplay({ playerId }) {
     : (isHomeTeam ? 'L' : 'W');
 
   return (
+    
     <div className="container mt-4">
       {/* outer card */}
       <div className="card shadow-sm border" >
 
-        {/* player header */}
-        <div className="card-header border-bottom bg-white d-flex align-items-center gap-3 p-3">
+        {/* player header with X button */}
+        <div className="card-header border-bottom bg-white d-flex align-items-center justify-content-between p-3">
           <div>
             <h5 className="mb-0 fw-500">{seasonAvg.firstName} {seasonAvg.lastName}</h5>
             <small className="text-muted">{seasonAvg.position} &nbsp;·&nbsp; {seasonAvg.teamName}</small>
           </div>
+          <button
+            onClick={onRemove}
+            className="btn btn-sm btn-outline-secondary"
+            style={{ lineHeight: 1 }}
+          >
+            ✕
+          </button>
         </div>
 
         <div className="card-body p-3">
@@ -66,16 +91,16 @@ function PlayerStatsDisplay({ playerId }) {
                 </p>
                 <div className="row row-cols-3 g-2 mb-3">
                   {[
-                    { value: seasonAvg.avgPoints, label: 'PPG' },
-                    { value: seasonAvg.avgAssists, label: 'APG' },
-                    { value: seasonAvg.avgRebounds, label: 'RPG' },
-                    { value: seasonAvg.avgSteals, label: 'SPG' },
-                    { value: seasonAvg.avgBlocks, label: 'BPG' },
-                    { value: seasonAvg.avgTurnovers, label: 'TOV' },
-                    { value: seasonAvg.plusMinus > 0 ? `+${seasonAvg.plusMinus}` : seasonAvg.plusMinus, label: '+/-' },
-                  ].map(({ value, label }) => (
+                    { value: seasonAvg.avgPoints, label: 'PPG', key: 'avgPoints' },
+                    { value: seasonAvg.avgAssists, label: 'APG', key: 'avgAssists' },
+                    { value: seasonAvg.avgRebounds, label: 'RPG', key: 'avgRebounds' },
+                    { value: seasonAvg.avgSteals, label: 'SPG', key: 'avgSteals' },
+                    { value: seasonAvg.avgBlocks, label: 'BPG', key: 'avgBlocks' },
+                    { value: seasonAvg.avgTurnovers, label: 'TOV', key: 'avgTurnovers', higherIsBetter: false },
+                    { value: seasonAvg.plusMinus > 0 ? `+${seasonAvg.plusMinus}` : seasonAvg.plusMinus, label: '+/-', key: 'plusMinus' },
+                  ].map(({ value, label, key, higherIsBetter = true }) => (
                     <div className="col" key={label}>
-                      <StatCard value={value} label={label} />
+                      <StatCard value={value} label={label} highlight={getHighlight(key, higherIsBetter)} />
                     </div>
                   ))}
                 </div>
@@ -87,12 +112,12 @@ function PlayerStatsDisplay({ playerId }) {
                   </p>
                   <div className="row row-cols-3 g-2">
                     {[
-                      { value: `${seasonAvg.fgPercentage ?? 0}%`, label: 'FG%' },
-                      { value: `${seasonAvg.tpPercentage ?? 0}%`, label: '3P%' },
-                      { value: `${seasonAvg.ftPercentage ?? 0}%`, label: 'FT%' },
-                    ].map(({ value, label }) => (
+                      { value: `${seasonAvg.fgPercentage ?? 0}%`, label: 'FG%', key: 'fgPercentage' },
+                      { value: `${seasonAvg.tpPercentage ?? 0}%`, label: '3P%', key: 'tpPercentage' },
+                      { value: `${seasonAvg.ftPercentage ?? 0}%`, label: 'FT%', key: 'ftPercentage' },
+                    ].map(({ value, label, key }) => (
                       <div className="col" key={label}>
-                        <StatCard value={value} label={label} />
+                        <StatCard value={value} label={label} highlight={getHighlight(key)} />
                       </div>
                     ))}
                   </div>
@@ -155,9 +180,9 @@ function PlayerStatsDisplay({ playerId }) {
   );
 }
 
-function StatCard({ value, label }) {
+function StatCard({ value, label, highlight = {} }) {
   return (
-    <div className="bg-light border rounded p-2 text-center">
+    <div className="border rounded p-2 text-center" style={{ fontSize: '13px', ...highlight }}>
       <p className="fw-500 mb-0" style={{ fontSize: '13px', whiteSpace: 'nowrap' }}>{value ?? '-'}</p>
       <p className="text-muted mb-0" style={{ fontSize: '10px', whiteSpace: 'nowrap' }}>{label}</p>
     </div>
