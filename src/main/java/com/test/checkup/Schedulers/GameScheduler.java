@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -31,7 +30,7 @@ public class GameScheduler {
     private BallDontLieConfig ballDontLieConfig;
 
 
-    @Scheduled(cron = "0 5 2 * * *")
+    @Scheduled(cron = "0 7 2 * * *")
     public void fetchYesterdaysGames() {
         String yesterday = LocalDate.now().minusDays(1).toString();
         System.out.println("Fetching games for: " + yesterday);

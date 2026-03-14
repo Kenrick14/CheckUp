@@ -196,9 +196,11 @@ public class BallDontLieServiceImpl implements BallDontLieService {
     public List<PlayerDto> getAndSavePlayers() {
         List<PlayerDto> players = getAllPlayers();
 
+        Set<Long> existingPlayerIds = new HashSet<>(playerRepository.findAllPlayerIds());
+
         List<Player> playerEntities = players.stream()
                 .map(playerMapper::mapFrom)
-                .filter(player -> !playerRepository.existsById(player.getId()))
+                .filter(player -> !existingPlayerIds.contains(player.getId()))
                 .collect(Collectors.toList());
         playerRepository.saveAll(playerEntities);
         return players;
@@ -208,9 +210,11 @@ public class BallDontLieServiceImpl implements BallDontLieService {
     public List<GameDto> getAndSaveGames() {
         List<GameDto> games = getAllGames();
 
+        Set<Long> existingGameIds = new HashSet<>(gameRepository.findAllGameIds());
+
         List<Game> gameEntities = games.stream()
                 .map(gameMapper::mapFrom)
-                .filter(game -> !gameRepository.existsById(game.getId()))
+                .filter(game -> !existingGameIds.contains(game.getId()))
                 .collect(Collectors.toList());
         gameRepository.saveAll(gameEntities);
         return games;
