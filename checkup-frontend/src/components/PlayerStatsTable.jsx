@@ -7,6 +7,9 @@ function PlayerStatsTable() {
   const [error, setError] = useState(null);
   const [sortConfig, setSortConfig] = useState({ key: 'avgPoints', direction: 'desc' });
   const [page, setPage] = useState(0);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedTeam, setSelectedTeam] = useState('');
+  const [selectedPosition, setSelectedPosition] = useState('');
   const pageSize = 20;
 
   useEffect(() => {
@@ -17,7 +20,7 @@ function PlayerStatsTable() {
     setLoading(true);
     try {
       const response = await allSeasonPlayerStats();
-      setStats(response.data.content); // or response.data if backend returns a list
+      setStats(response.data.content);
     } catch (err) {
       setError('Failed to load stats');
     } finally {
@@ -38,14 +41,32 @@ function PlayerStatsTable() {
     return sortConfig.direction === 'desc' ? ' ↓' : ' ↑';
   };
 
-  // sort in React
-  const sorted = [...stats].sort((a, b) => {
+  // get unique teams and positions from data for filter dropdowns
+  const teams = [...new Set(stats.map(p => p.teamName))].sort();
+  const positions = [...new Set(stats.map(p => p.position).filter(Boolean))].sort();
+
+  // filter
+  const filtered = stats.filter(player => {
+    const fullName = `${player.firstName} ${player.lastName}`.toLowerCase();
+    const matchesName = fullName.includes(searchQuery.toLowerCase());
+    const matchesTeam = selectedTeam === '' || player.teamName === selectedTeam;
+    const matchesPosition = selectedPosition === '' || player.position === selectedPosition;
+    return matchesName && matchesTeam && matchesPosition;
+  });
+
+  // sort
+  const sorted = [...filtered].sort((a, b) => {
     const aVal = a[sortConfig.key] ?? 0;
     const bVal = b[sortConfig.key] ?? 0;
+    if (typeof aVal === 'string') {
+      return sortConfig.direction === 'desc'
+        ? bVal.localeCompare(aVal)
+        : aVal.localeCompare(bVal);
+    }
     return sortConfig.direction === 'desc' ? bVal - aVal : aVal - bVal;
   });
 
-  // paginate in React
+  // paginate
   const totalPages = Math.ceil(sorted.length / pageSize);
   const paginated = sorted.slice(page * pageSize, (page + 1) * pageSize);
 
@@ -65,11 +86,83 @@ function PlayerStatsTable() {
     { label: '+/-', key: 'plusMinus' },
   ];
 
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+    setPage(0); // reset to first page on filter change
+  };
+
+  const handleTeamChange = (e) => {
+    setSelectedTeam(e.target.value);
+    setPage(0);
+  };
+
+  const handlePositionChange = (e) => {
+    setSelectedPosition(e.target.value);
+    setPage(0);
+  };
+
+  const handleClearFilters = () => {
+    setSearchQuery('');
+    setSelectedTeam('');
+    setSelectedPosition('');
+    setPage(0);
+  };
+
+  if (error) return <p className="text-danger p-3">{error}</p>;
+
   return (
     <div className="container-fluid mt-4 px-4">
       <div className="card shadow-sm border">
         <div className="card-header bg-white border-bottom p-3">
-          <h5 className="mb-0 fw-500">2025-26 season averages</h5>
+          <div className="d-flex justify-content-between align-items-center mb-3">
+            <h5 className="mb-0 fw-500">2025-26 season averages</h5>
+            <small className="text-muted">{sorted.length} players</small>
+          </div>
+
+          {/* filters */}
+          <div className="row g-2">
+            <div className="col-md-4">
+              <input
+                type="text"
+                className="form-control form-control-sm"
+                placeholder="Search by name..."
+                value={searchQuery}
+                onChange={handleSearchChange}
+              />
+            </div>
+            <div className="col-md-3">
+              <select
+                className="form-select form-select-sm"
+                value={selectedTeam}
+                onChange={handleTeamChange}
+              >
+                <option value="">All teams</option>
+                {teams.map(team => (
+                  <option key={team} value={team}>{team}</option>
+                ))}
+              </select>
+            </div>
+            <div className="col-md-3">
+              <select
+                className="form-select form-select-sm"
+                value={selectedPosition}
+                onChange={handlePositionChange}
+              >
+                <option value="">All positions</option>
+                {positions.map(pos => (
+                  <option key={pos} value={pos}>{pos}</option>
+                ))}
+              </select>
+            </div>
+            <div className="col-md-2">
+              <button
+                className="btn btn-sm btn-outline-secondary w-100"
+                onClick={handleClearFilters}
+              >
+                Clear
+              </button>
+            </div>
+          </div>
         </div>
 
         <div className="card-body p-0">
@@ -93,7 +186,7 @@ function PlayerStatsTable() {
                   </tr>
                 </thead>
                 <tbody>
-                  {paginated.map((player) => (
+                  {paginated.length > 0 ? paginated.map((player) => (
                     <tr key={player.playerId}>
                       <td style={{ whiteSpace: 'nowrap', fontSize: '13px' }}>
                         {player.firstName} {player.lastName}
@@ -113,7 +206,13 @@ function PlayerStatsTable() {
                         {player.plusMinus > 0 ? `+${player.plusMinus}` : player.plusMinus}
                       </td>
                     </tr>
-                  ))}
+                  )) : (
+                    <tr>
+                      <td colSpan={columns.length} className="text-center text-muted p-3">
+                        No players found
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
@@ -122,7 +221,7 @@ function PlayerStatsTable() {
 
         {/* pagination */}
         <div className="card-footer bg-white border-top d-flex justify-content-between align-items-center p-3">
-          <small className="text-muted">Page {page + 1} of {totalPages}</small>
+          <small className="text-muted">Page {page + 1} of {totalPages || 1}</small>
           <div className="d-flex gap-2">
             <button
               className="btn btn-sm btn-outline-secondary"
@@ -134,7 +233,7 @@ function PlayerStatsTable() {
             <button
               className="btn btn-sm btn-outline-secondary"
               onClick={() => setPage(prev => Math.min(totalPages - 1, prev + 1))}
-              disabled={page === totalPages - 1}
+              disabled={page >= totalPages - 1}
             >
               Next
             </button>

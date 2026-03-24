@@ -21,3 +21,7 @@ export const allSeasonPlayerStats = async () => {
         params: { page: 0, size: 10000 } // fetch all in one request
     });
 }
+
+export const getLeaders = async () => {
+    return await axios.get(`${BASE_API_URL}players/leaders`);
+}
