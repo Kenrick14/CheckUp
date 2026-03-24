@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @CrossOrigin("*")
 @RestController
@@ -55,5 +56,10 @@ public class PlayerController {
     public ResponseEntity<Page<PlayerSeasonAveragesDto>> getAllSeasonAverages(Pageable pageable) {
         Page<PlayerSeasonAveragesDto> allSeasonAverages = playerService.allPlayerSeasonAverages(pageable);
         return ResponseEntity.ok(allSeasonAverages);
+    }
+
+    @GetMapping(path = "/players/leaders")
+    public ResponseEntity<Map<String, List<PlayerSeasonAveragesDto>>> getLeaders() {
+        return ResponseEntity.ok(playerService.getLeaders());
     }
 }
