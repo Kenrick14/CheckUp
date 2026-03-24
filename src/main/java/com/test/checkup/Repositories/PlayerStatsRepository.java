@@ -65,5 +65,5 @@ public interface PlayerStatsRepository extends JpaRepository<PlayerStats, Long>,
             "FROM PlayerStats ps " +
             "WHERE ps.min > 0 " +
             "GROUP BY ps.player.id, ps.player.firstName, ps.player.lastName, ps.player.position, ps.player.team.name")
-    List<PlayerSeasonAveragesDto> getAllSeasonAvg();
+    Page<PlayerSeasonAveragesDto> getAllSeasonAvg(Pageable pageable);
 }
