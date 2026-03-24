@@ -7,43 +7,47 @@ function PlayerStatsTable() {
   const [error, setError] = useState(null);
   const [sortConfig, setSortConfig] = useState({ key: 'avgPoints', direction: 'desc' });
   const [page, setPage] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
   const pageSize = 20;
 
   useEffect(() => {
     fetchStats();
-  }, [page, sortConfig]);
+  }, []);
 
   const fetchStats = async () => {
     setLoading(true);
     try {
-        const response = await allSeasonPlayerStats(
-            page,
-            pageSize,
-            `${sortConfig.key},${sortConfig.direction}`
-        );
-        setStats(response.data.content);
-        setTotalPages(response.data.totalPages);
+      const response = await allSeasonPlayerStats();
+      setStats(response.data.content); // or response.data if backend returns a list
     } catch (err) {
-        setError('Failed to load stats');
-        console.error(err);
+      setError('Failed to load stats');
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
-    };
+  };
 
   const handleSort = (key) => {
     setSortConfig(prev => ({
       key,
       direction: prev.key === key && prev.direction === 'desc' ? 'asc' : 'desc'
     }));
-    setPage(0); // reset to first page on sort change
+    setPage(0);
   };
 
   const getSortIcon = (key) => {
     if (sortConfig.key !== key) return ' ↕';
     return sortConfig.direction === 'desc' ? ' ↓' : ' ↑';
   };
+
+  // sort in React
+  const sorted = [...stats].sort((a, b) => {
+    const aVal = a[sortConfig.key] ?? 0;
+    const bVal = b[sortConfig.key] ?? 0;
+    return sortConfig.direction === 'desc' ? bVal - aVal : aVal - bVal;
+  });
+
+  // paginate in React
+  const totalPages = Math.ceil(sorted.length / pageSize);
+  const paginated = sorted.slice(page * pageSize, (page + 1) * pageSize);
 
   const columns = [
     { label: 'Player', key: 'lastName' },
@@ -60,8 +64,6 @@ function PlayerStatsTable() {
     { label: 'FT%', key: 'ftPercentage' },
     { label: '+/-', key: 'plusMinus' },
   ];
-
-  if (error) return <p className="text-danger p-3">{error}</p>;
 
   return (
     <div className="container-fluid mt-4 px-4">
@@ -91,7 +93,7 @@ function PlayerStatsTable() {
                   </tr>
                 </thead>
                 <tbody>
-                  {stats.map((player) => (
+                  {paginated.map((player) => (
                     <tr key={player.playerId}>
                       <td style={{ whiteSpace: 'nowrap', fontSize: '13px' }}>
                         {player.firstName} {player.lastName}

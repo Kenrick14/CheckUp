@@ -12,13 +12,12 @@ export const seasonPlayerStats = async (playerId) => {
     return await axios.get(`${BASE_API_URL}players/stats/${playerId}`);
 }
 
-export const allSeasonPlayerStats = async (page = 0, size = 20, sort = 'avgPoints,desc') => {
-    return await axios.get(`${BASE_API_URL}players/stats`, {
-        params: { page, size, sort }
-    });
-}
-
 export const recentPlayerStats = async (playerId) => {
     return await axios.get(`${BASE_API_URL}players/stats/recent/${playerId}`);
 }
 
+export const allSeasonPlayerStats = async () => {
+    return await axios.get(`${BASE_API_URL}players/stats`, {
+        params: { page: 0, size: 10000 } // fetch all in one request
+    });
+}
