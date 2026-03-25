@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { allSeasonPlayerStats } from '../services/PlayerService';
+import '../styling/PlayerStatsTable.css';
 
 function PlayerStatsTable() {
   const [stats, setStats] = useState([]);
@@ -41,11 +42,9 @@ function PlayerStatsTable() {
     return sortConfig.direction === 'desc' ? ' ↓' : ' ↑';
   };
 
-  // get unique teams and positions from data for filter dropdowns
   const teams = [...new Set(stats.map(p => p.teamName))].sort();
   const positions = [...new Set(stats.map(p => p.position).filter(Boolean))].sort();
 
-  // filter
   const filtered = stats.filter(player => {
     const fullName = `${player.firstName} ${player.lastName}`.toLowerCase();
     const matchesName = fullName.includes(searchQuery.toLowerCase());
@@ -54,7 +53,6 @@ function PlayerStatsTable() {
     return matchesName && matchesTeam && matchesPosition;
   });
 
-  // sort
   const sorted = [...filtered].sort((a, b) => {
     const aVal = a[sortConfig.key] ?? 0;
     const bVal = b[sortConfig.key] ?? 0;
@@ -66,7 +64,6 @@ function PlayerStatsTable() {
     return sortConfig.direction === 'desc' ? bVal - aVal : aVal - bVal;
   });
 
-  // paginate
   const totalPages = Math.ceil(sorted.length / pageSize);
   const paginated = sorted.slice(page * pageSize, (page + 1) * pageSize);
 
@@ -86,152 +83,124 @@ function PlayerStatsTable() {
     { label: '+/-', key: 'plusMinus' },
   ];
 
-  const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value);
-    setPage(0); // reset to first page on filter change
-  };
+  const handleSearchChange = (e) => { setSearchQuery(e.target.value); setPage(0); };
+  const handleTeamChange = (e) => { setSelectedTeam(e.target.value); setPage(0); };
+  const handlePositionChange = (e) => { setSelectedPosition(e.target.value); setPage(0); };
+  const handleClearFilters = () => { setSearchQuery(''); setSelectedTeam(''); setSelectedPosition(''); setPage(0); };
 
-  const handleTeamChange = (e) => {
-    setSelectedTeam(e.target.value);
-    setPage(0);
-  };
-
-  const handlePositionChange = (e) => {
-    setSelectedPosition(e.target.value);
-    setPage(0);
-  };
-
-  const handleClearFilters = () => {
-    setSearchQuery('');
-    setSelectedTeam('');
-    setSelectedPosition('');
-    setPage(0);
-  };
-
-  if (error) return <p className="text-danger p-3">{error}</p>;
+  if (error) return <p className="pst-error">{error}</p>;
 
   return (
-    <div className="container-fluid mt-4 px-4">
-      <div className="card shadow-sm border">
-        <div className="card-header bg-white border-bottom p-3">
-          <div className="d-flex justify-content-between align-items-center mb-3">
-            <h5 className="mb-0 fw-500">2025-26 season averages</h5>
-            <small className="text-muted">{sorted.length} players</small>
+    <div className="pst-page">
+      <div className="pst-card">
+
+        {/* header */}
+        <div className="pst-header">
+          <div className="pst-header-top">
+            <h5 className="pst-title">2025-26 season averages</h5>
+            <span className="pst-count">{sorted.length} players</span>
           </div>
 
           {/* filters */}
-          <div className="row g-2">
-            <div className="col-md-4">
-              <input
-                type="text"
-                className="form-control form-control-sm"
-                placeholder="Search by name..."
-                value={searchQuery}
-                onChange={handleSearchChange}
-              />
-            </div>
-            <div className="col-md-3">
-              <select
-                className="form-select form-select-sm"
-                value={selectedTeam}
-                onChange={handleTeamChange}
-              >
-                <option value="">All teams</option>
-                {teams.map(team => (
-                  <option key={team} value={team}>{team}</option>
-                ))}
-              </select>
-            </div>
-            <div className="col-md-3">
-              <select
-                className="form-select form-select-sm"
-                value={selectedPosition}
-                onChange={handlePositionChange}
-              >
-                <option value="">All positions</option>
-                {positions.map(pos => (
-                  <option key={pos} value={pos}>{pos}</option>
-                ))}
-              </select>
-            </div>
-            <div className="col-md-2">
-              <button
-                className="btn btn-sm btn-outline-secondary w-100"
-                onClick={handleClearFilters}
-              >
-                Clear
-              </button>
-            </div>
+          <div className="pst-filters">
+            <input
+              type="text"
+              className="pst-filter-input"
+              placeholder="Search by name..."
+              value={searchQuery}
+              onChange={handleSearchChange}
+            />
+            <select
+              className="pst-filter-select"
+              value={selectedTeam}
+              onChange={handleTeamChange}
+            >
+              <option value="">All teams</option>
+              {teams.map(team => (
+                <option key={team} value={team}>{team}</option>
+              ))}
+            </select>
+            <select
+              className="pst-filter-select"
+              value={selectedPosition}
+              onChange={handlePositionChange}
+            >
+              <option value="">All positions</option>
+              {positions.map(pos => (
+                <option key={pos} value={pos}>{pos}</option>
+              ))}
+            </select>
+            <button className="pst-clear-btn" onClick={handleClearFilters}>
+              Clear
+            </button>
           </div>
         </div>
 
-        <div className="card-body p-0">
+        {/* table */}
+        <div className="pst-table-wrapper">
           {loading ? (
-            <p className="text-muted p-3">Loading...</p>
+            <p className="pst-loading">Loading...</p>
           ) : (
-            <div className="table-responsive">
-              <table className="table table-hover table-bordered mb-0">
-                <thead className="table-light">
-                  <tr>
-                    {columns.map(({ label, key }) => (
-                      <th
-                        key={key}
-                        onClick={() => handleSort(key)}
-                        style={{ cursor: 'pointer', whiteSpace: 'nowrap', fontSize: '12px' }}
-                        className="text-center"
-                      >
-                        {label}{getSortIcon(key)}
-                      </th>
-                    ))}
+            <table className="pst-table">
+              <thead>
+                <tr>
+                  {columns.map(({ label, key }) => (
+                    <th
+                      key={key}
+                      className={`pst-th ${sortConfig.key === key ? 'pst-th--active' : ''}`}
+                      onClick={() => handleSort(key)}
+                    >
+                      {label}{getSortIcon(key)}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {paginated.length > 0 ? paginated.map((player) => (
+                  <tr key={player.playerId} className="pst-row">
+                    <td className="pst-td pst-td--name">
+                      {player.firstName} {player.lastName}
+                    </td>
+                    <td className="pst-td">{player.teamName}</td>
+                    <td className="pst-td">{player.position}</td>
+                    <td className="pst-td">{player.avgPoints}</td>
+                    <td className="pst-td">{player.avgAssists}</td>
+                    <td className="pst-td">{player.avgRebounds}</td>
+                    <td className="pst-td">{player.avgSteals}</td>
+                    <td className="pst-td">{player.avgBlocks}</td>
+                    <td className="pst-td">{player.avgTurnovers}</td>
+                    <td className="pst-td">{player.fgPercentage ?? 0}%</td>
+                    <td className="pst-td">{player.tpPercentage ?? 0}%</td>
+                    <td className="pst-td">{player.ftPercentage ?? 0}%</td>
+                    <td className="pst-td">
+                      {player.plusMinus > 0 ? `+${player.plusMinus}` : player.plusMinus}
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {paginated.length > 0 ? paginated.map((player) => (
-                    <tr key={player.playerId}>
-                      <td style={{ whiteSpace: 'nowrap', fontSize: '13px' }}>
-                        {player.firstName} {player.lastName}
-                      </td>
-                      <td className="text-center" style={{ fontSize: '13px' }}>{player.teamName}</td>
-                      <td className="text-center" style={{ fontSize: '13px' }}>{player.position}</td>
-                      <td className="text-center" style={{ fontSize: '13px' }}>{player.avgPoints}</td>
-                      <td className="text-center" style={{ fontSize: '13px' }}>{player.avgAssists}</td>
-                      <td className="text-center" style={{ fontSize: '13px' }}>{player.avgRebounds}</td>
-                      <td className="text-center" style={{ fontSize: '13px' }}>{player.avgSteals}</td>
-                      <td className="text-center" style={{ fontSize: '13px' }}>{player.avgBlocks}</td>
-                      <td className="text-center" style={{ fontSize: '13px' }}>{player.avgTurnovers}</td>
-                      <td className="text-center" style={{ fontSize: '13px' }}>{player.fgPercentage ?? 0}%</td>
-                      <td className="text-center" style={{ fontSize: '13px' }}>{player.tpPercentage ?? 0}%</td>
-                      <td className="text-center" style={{ fontSize: '13px' }}>{player.ftPercentage ?? 0}%</td>
-                      <td className="text-center" style={{ fontSize: '13px' }}>
-                        {player.plusMinus > 0 ? `+${player.plusMinus}` : player.plusMinus}
-                      </td>
-                    </tr>
-                  )) : (
-                    <tr>
-                      <td colSpan={columns.length} className="text-center text-muted p-3">
-                        No players found
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+                )) : (
+                  <tr>
+                    <td colSpan={columns.length} className="pst-td pst-empty">
+                      No players found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           )}
         </div>
 
         {/* pagination */}
-        <div className="card-footer bg-white border-top d-flex justify-content-between align-items-center p-3">
-          <small className="text-muted">Page {page + 1} of {totalPages || 1}</small>
-          <div className="d-flex gap-2">
+        <div className="pst-footer">
+          <span className="pst-page-info">Page {page + 1} of {totalPages || 1}</span>
+          <div className="pst-pagination">
             <button
-              className="btn btn-sm btn-outline-secondary"
+              className="pst-page-btn"
               onClick={() => setPage(prev => Math.max(0, prev - 1))}
               disabled={page === 0}
             >
               Previous
             </button>
             <button
-              className="btn btn-sm btn-outline-secondary"
+              className="pst-page-btn"
               onClick={() => setPage(prev => Math.min(totalPages - 1, prev + 1))}
               disabled={page >= totalPages - 1}
             >

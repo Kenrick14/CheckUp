@@ -1,0 +1,84 @@
+.ct-card {
+    background-color: #1a1d27;
+    border: 1px solid #2a2d3a;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-top: 16px;
+}
+
+.ct-header {
+    padding: 10px 12px;
+    border-bottom: 1px solid #2a2d3a;
+}
+
+.ct-label {
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #6b7280;
+}
+
+.ct-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.ct-th {
+    padding: 8px 10px;
+    font-size: 11px;
+    font-weight: 500;
+    color: #6b7280;
+    background-color: #22253a;
+    border-bottom: 1px solid #2a2d3a;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 70px;
+}
+
+.ct-th--center {
+    text-align: center;
+    width: 40px;
+}
+
+.ct-th--right {
+    text-align: right;
+}
+
+.ct-row:not(:last-child) {
+    border-bottom: 1px solid #2a2d3a;
+}
+
+.ct-cell {
+    padding: 7px 10px;
+    font-size: 12px;
+    color: #e8e8e8;
+    text-align: left;
+    white-space: nowrap;
+    transition: background-color 0.15s ease;
+}
+
+.ct-cell--right {
+    text-align: right;
+}
+
+.ct-cell--stat-label {
+    text-align: center;
+    font-size: 10px;
+    font-weight: 500;
+    color: #6b7280;
+    background-color: #22253a;
+    width: 40px;
+}
+
+.ct-cell--better {
+    color: #4ade80;
+    background-color: rgba(74, 222, 128, 0.08);
+}
+
+.ct-cell--worse {
+    color: #f87171;
+    background-color: rgba(248, 113, 113, 0.08);
+}

@@ -1,6 +1,7 @@
 import React from 'react';
+import '../styling/ComparisonTable.css';
 
-const stats = [
+const statRows = [
     { label: 'PPG', key: 'avgPoints', higherIsBetter: true },
     { label: 'APG', key: 'avgAssists', higherIsBetter: true },
     { label: 'RPG', key: 'avgRebounds', higherIsBetter: true },
@@ -24,74 +25,55 @@ function ComparisonTable({ comparisonStats, selectedPlayers }) {
         if (val1 === val2) return ['', ''];
         const p1Better = higherIsBetter ? val1 > val2 : val1 < val2;
         return p1Better
-            ? ['table-success', 'table-danger']
-            : ['table-danger', 'table-success'];
+            ? ['ct-cell--better', 'ct-cell--worse']
+            : ['ct-cell--worse', 'ct-cell--better'];
     };
 
     const formatValue = (stats, key) => {
         const val = stats[key];
         if (val == null) return '0';
-        if (key === 'fgPercentage' || key === 'tpPercentage' || key === 'ftPercentage') return `${val}%`;
+        if (['fgPercentage', 'tpPercentage', 'ftPercentage'].includes(key)) return `${val}%`;
         if (key === 'plusMinus') return val > 0 ? `+${val}` : `${val}`;
         return val;
     };
 
-    const getDiff = (key) => {
-        const val1 = player1Stats[key] ?? 0;
-        const val2 = player2Stats[key] ?? 0;
-        const diff = (val1 - val2).toFixed(1);
-        return diff > 0 ? `+${diff}` : `${diff}`;
-    };
-
     return (
-        <div className="card shadow-sm border mt-4">
-            <div className="card-header bg-white border-bottom p-2">
-                <p className="mb-0 text-muted text-uppercase"
-                    style={{ fontSize: '10px', letterSpacing: '0.05em', fontWeight: '500' }}>
-                    comparison
-                </p>
+        <div className="ct-card">
+            <div className="ct-header">
+                <span className="ct-label">comparison</span>
             </div>
-            <div className="card-body p-0">
-                <table className="table table-bordered mb-0">
-                    <thead className="table-light">
-                        <tr>
-                            <th className="text-center p-1" style={{ fontSize: '10px' }}>
-                                {player1Stats.lastName}
-                            </th>
-                            <th className="text-center p-1" style={{ fontSize: '10px', width: '45px' }}>
-                            </th>
-                            <th className="text-center p-1" style={{ fontSize: '10px' }}>
-                                {player2Stats.lastName}
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {stats.map(({ label, key, higherIsBetter }) => {
-                            const val1 = player1Stats[key] ?? 0;
-                            const val2 = player2Stats[key] ?? 0;
-                            const [hl1, hl2] = getHighlight(val1, val2, higherIsBetter);
+            <table className="ct-table">
+                <thead>
+                    <tr>
+                        <th className="ct-th">{player1Stats.lastName}</th>
+                        <th className="ct-th ct-th--center"></th>
+                        <th className="ct-th ct-th--right">{player2Stats.lastName}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {statRows.map(({ label, key, higherIsBetter }) => {
+                        const val1 = player1Stats[key] ?? 0;
+                        const val2 = player2Stats[key] ?? 0;
+                        const [hl1, hl2] = getHighlight(val1, val2, higherIsBetter);
 
-                            return (
-                                <tr key={key}>
-                                    <td className={`text-center p-1 ${hl1}`} style={{ fontSize: '11px' }}>
-                                        {formatValue(player1Stats, key)}
-                                    </td>
-                                    <td className="text-center p-1 table-light"
-                                        style={{ fontSize: '10px', fontWeight: '500' }}>
-                                        {label}
-                                    </td>
-                                    <td className={`text-center p-1 ${hl2}`} style={{ fontSize: '11px' }}>
-                                        {formatValue(player2Stats, key)}
-                                    </td>
-                                </tr>
-                            );
-                        })}
-                    </tbody>
-                </table>
-            </div>
+                        return (
+                            <tr key={key} className="ct-row">
+                                <td className={`ct-cell ${hl1}`}>
+                                    {formatValue(player1Stats, key)}
+                                </td>
+                                <td className="ct-cell ct-cell--stat-label">
+                                    {label}
+                                </td>
+                                <td className={`ct-cell ct-cell--right ${hl2}`}>
+                                    {formatValue(player2Stats, key)}
+                                </td>
+                            </tr>
+                        );
+                    })}
+                </tbody>
+            </table>
         </div>
     );
-
 }
 
 export default ComparisonTable;

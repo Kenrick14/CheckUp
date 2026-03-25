@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { seasonPlayerStats, recentPlayerStats } from '../services/PlayerService';
+import '../styling/PlayerStatsDisplay.css';
 
 function PlayerStatsDisplay({ playerId, onRemove, onStatsLoaded, comparisonStats }) {
   const [seasonAvg, setSeasonAvg] = useState(null);
@@ -17,7 +18,7 @@ function PlayerStatsDisplay({ playerId, onRemove, onStatsLoaded, comparisonStats
       ]);
       setSeasonAvg(avgRes.data);
       setRecentGame(recentRes.data);
-      onStatsLoaded(avgRes.data); // notify SearchBox that stats are loaded
+      onStatsLoaded(avgRes.data);
     } catch (err) {
       setError('Failed to load player data');
       console.error(err);
@@ -26,20 +27,19 @@ function PlayerStatsDisplay({ playerId, onRemove, onStatsLoaded, comparisonStats
     }
   };
 
-   // compare this player's stat against the other player's stat
   const getHighlight = (statKey, higherIsBetter = true) => {
     const otherStats = Object.entries(comparisonStats)
-        .find(([id]) => Number(id) !== playerId)?.[1];
+      .find(([id]) => Number(id) !== playerId)?.[1];
 
-    if (!otherStats || !seasonAvg) return {};
+    if (!otherStats || !seasonAvg) return '';
 
     const myValue = seasonAvg[statKey];
     const otherValue = otherStats[statKey];
 
-    if (myValue === otherValue) return {};
+    if (myValue === otherValue) return '';
 
     const isBetter = higherIsBetter ? myValue > otherValue : myValue < otherValue;
-    return { backgroundColor: isBetter ? '#d4edda' : '#f8d7da' };
+    return isBetter ? 'stat-card--better' : 'stat-card--worse';
   };
 
   useEffect(() => {
@@ -49,142 +49,122 @@ function PlayerStatsDisplay({ playerId, onRemove, onStatsLoaded, comparisonStats
   const getInitials = (firstName, lastName) =>
     `${firstName?.[0] ?? ''}${lastName?.[0] ?? ''}`.toUpperCase();
 
-  if (loading) return <p className="text-muted p-3">Loading...</p>;
-  if (error) return <p className="text-danger p-3">{error}</p>;
+  if (loading) return <p className="psd-loading">Loading...</p>;
+  if (error) return <p className="psd-error">{error}</p>;
   if (!seasonAvg) return null;
 
   const isHomeTeam = seasonAvg.teamName === recentGame?.game?.home_team?.name;
-  const opponent = isHomeTeam ? recentGame?.game?.visitor_team?.name : recentGame?.game?.home_team?.name;
+  const opponent = isHomeTeam
+    ? recentGame?.game?.visitor_team?.name
+    : recentGame?.game?.home_team?.name;
   const gameResult = recentGame?.game?.home_team_score > recentGame?.game?.visitor_team_score
     ? (isHomeTeam ? 'W' : 'L')
     : (isHomeTeam ? 'L' : 'W');
 
   return (
-    
-    <div className="container mt-4">
-      {/* outer card */}
-      <div className="card shadow-sm border" >
+    <div className="psd-card">
 
-        {/* player header with X button */}
-        <div className="card-header border-bottom bg-white d-flex align-items-center justify-content-between p-3">
-          <div>
-            <h5 className="mb-0 fw-500">{seasonAvg.firstName} {seasonAvg.lastName}</h5>
-            <small className="text-muted">{seasonAvg.position} &nbsp;·&nbsp; {seasonAvg.teamName}</small>
-          </div>
-          <button
-            onClick={onRemove}
-            className="btn btn-sm btn-outline-secondary"
-            style={{ lineHeight: 1 }}
-          >
-            ✕
-          </button>
+      {/* header */}
+      <div className="psd-header">
+        <div className="psd-initials">
+          {getInitials(seasonAvg.firstName, seasonAvg.lastName)}
         </div>
+        <div className="psd-header-info">
+          <h5 className="psd-name">{seasonAvg.firstName} {seasonAvg.lastName}</h5>
+          <span className="psd-meta">{seasonAvg.position} · {seasonAvg.teamName}</span>
+        </div>
+        <button className="psd-remove-btn" onClick={onRemove}>✕</button>
+      </div>
 
-        <div className="card-body p-3">
-          <div className="row g-3">
+      <div className="psd-body">
 
-            {/* season averages */}
-            <div className="col-md-6">
-              <div className="border rounded p-3 h-100">
-                <p className="text-muted text-uppercase fw-500 mb-3" style={{ fontSize: '11px', letterSpacing: '0.05em' }}>
-                  2025-26 season averages
-                </p>
-                <div className="row row-cols-3 g-2 mb-3">
-                  {[
-                    { value: seasonAvg.avgPoints, label: 'PPG', key: 'avgPoints' },
-                    { value: seasonAvg.avgAssists, label: 'APG', key: 'avgAssists' },
-                    { value: seasonAvg.avgRebounds, label: 'RPG', key: 'avgRebounds' },
-                    { value: seasonAvg.avgSteals, label: 'SPG', key: 'avgSteals' },
-                    { value: seasonAvg.avgBlocks, label: 'BPG', key: 'avgBlocks' },
-                    { value: seasonAvg.avgTurnovers, label: 'TOV', key: 'avgTurnovers', higherIsBetter: false },
-                    { value: seasonAvg.plusMinus > 0 ? `+${seasonAvg.plusMinus}` : seasonAvg.plusMinus, label: '+/-', key: 'plusMinus' },
-                  ].map(({ value, label, key, higherIsBetter = true }) => (
-                    <div className="col" key={label}>
-                      <StatCard value={value} label={label} highlight={getHighlight(key, higherIsBetter)} />
-                    </div>
-                  ))}
-                </div>
+        {/* season averages */}
+        <div className="psd-section">
+          <p className="psd-section-label">2025-26 season averages</p>
+          <div className="psd-stat-grid">
+            {[
+              { value: seasonAvg.avgPoints, label: 'PPG', key: 'avgPoints' },
+              { value: seasonAvg.avgAssists, label: 'APG', key: 'avgAssists' },
+              { value: seasonAvg.avgRebounds, label: 'RPG', key: 'avgRebounds' },
+              { value: seasonAvg.avgSteals, label: 'SPG', key: 'avgSteals' },
+              { value: seasonAvg.avgBlocks, label: 'BPG', key: 'avgBlocks' },
+              { value: seasonAvg.avgTurnovers, label: 'TOV', key: 'avgTurnovers', higherIsBetter: false },
+              { value: seasonAvg.plusMinus > 0 ? `+${seasonAvg.plusMinus}` : seasonAvg.plusMinus, label: '+/-', key: 'plusMinus' },
+            ].map(({ value, label, key, higherIsBetter = true }) => (
+              <StatCard
+                key={label}
+                value={value}
+                label={label}
+                highlightClass={getHighlight(key, higherIsBetter)}
+              />
+            ))}
+          </div>
 
-                {/* shooting */}
-                <div className="border-top pt-3">
-                  <p className="text-muted text-uppercase fw-500 mb-2" style={{ fontSize: '11px', letterSpacing: '0.05em' }}>
-                    shooting
-                  </p>
-                  <div className="row row-cols-3 g-2">
-                    {[
-                      { value: `${seasonAvg.fgPercentage ?? 0}%`, label: 'FG%', key: 'fgPercentage' },
-                      { value: `${seasonAvg.tpPercentage ?? 0}%`, label: '3P%', key: 'tpPercentage' },
-                      { value: `${seasonAvg.ftPercentage ?? 0}%`, label: 'FT%', key: 'ftPercentage' },
-                    ].map(({ value, label, key }) => (
-                      <div className="col" key={label}>
-                        <StatCard value={value} label={label} highlight={getHighlight(key)} />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* most recent game */}
-            <div className="col-md-6">
-              <div className="border rounded p-3 h-100">
-                <p className="text-muted text-uppercase fw-500 mb-3" style={{ fontSize: '11px', letterSpacing: '0.05em' }}>
-                  most recent game
-                </p>
-
-                {recentGame ? (
-                  <>
-                    <p className="text-muted mb-3" style={{ fontSize: '13px' }}>
-                      vs {opponent} &nbsp;·&nbsp; {gameResult} &nbsp;·&nbsp; {recentGame.game.date}
-                    </p>
-
-                    <div className="row row-cols-2 g-2 mb-3">
-                      {[
-                        { value: recentGame.pts, label: 'PTS' },
-                        { value: recentGame.ast, label: 'AST' },
-                        { value: recentGame.reb, label: 'REB' },
-                        { value: recentGame.stl, label: 'STL' },
-                        { value: recentGame.blk, label: 'BLK' },
-                        { value: recentGame.plus_minus > 0 ? `+${recentGame.plus_minus}` : recentGame.plus_minus, label: '+/-' },
-                      ].map(({ value, label }) => (
-                        <div className="col" key={label}>
-                          <StatCard value={value} label={label} />
-                        </div>
-                      ))}
-                    </div>
-
-                    <div className="border-top pt-3">
-                      <div className="row row-cols-3 g-2">
-                        {[
-                          { value: `${recentGame.fgm}/${recentGame.fga}`, label: 'FG' },
-                          { value: `${recentGame.fg3m}/${recentGame.fg3a}`, label: '3P' },
-                          { value: `${recentGame.ftm}/${recentGame.fta}`, label: 'FT' },
-                        ].map(({ value, label }) => (
-                          <div className="col" key={label}>
-                            <StatCard value={value} label={label} />
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </>
-                ) : (
-                  <p className="text-muted" style={{ fontSize: '13px' }}>No recent game data</p>
-                )}
-              </div>
-            </div>
-
+          {/* shooting */}
+          <div className="psd-divider" />
+          <p className="psd-section-label">shooting</p>
+          <div className="psd-stat-grid psd-stat-grid--3">
+            {[
+              { value: `${seasonAvg.fgPercentage ?? 0}%`, label: 'FG%', key: 'fgPercentage' },
+              { value: `${seasonAvg.tpPercentage ?? 0}%`, label: '3P%', key: 'tpPercentage' },
+              { value: `${seasonAvg.ftPercentage ?? 0}%`, label: 'FT%', key: 'ftPercentage' },
+            ].map(({ value, label, key }) => (
+              <StatCard
+                key={label}
+                value={value}
+                label={label}
+                highlightClass={getHighlight(key)}
+              />
+            ))}
           </div>
         </div>
+
+        {/* most recent game */}
+        <div className="psd-section">
+          <p className="psd-section-label">most recent game</p>
+          {recentGame ? (
+            <>
+              <p className="psd-game-meta">
+                vs {opponent} · {gameResult} · {recentGame.game.date}
+              </p>
+              <div className="psd-stat-grid psd-stat-grid--3">
+                {[
+                  { value: recentGame.pts, label: 'PTS' },
+                  { value: recentGame.ast, label: 'AST' },
+                  { value: recentGame.reb, label: 'REB' },
+                  { value: recentGame.stl, label: 'STL' },
+                  { value: recentGame.blk, label: 'BLK' },
+                  { value: recentGame.plus_minus > 0 ? `+${recentGame.plus_minus}` : recentGame.plus_minus, label: '+/-' },
+                ].map(({ value, label }) => (
+                  <StatCard key={label} value={value} label={label} />
+                ))}
+              </div>
+              <div className="psd-divider" />
+              <div className="psd-stat-grid psd-stat-grid--3">
+                {[
+                  { value: `${recentGame.fgm}/${recentGame.fga}`, label: 'FG' },
+                  { value: `${recentGame.fg3m}/${recentGame.fg3a}`, label: '3P' },
+                  { value: `${recentGame.ftm}/${recentGame.fta}`, label: 'FT' },
+                ].map(({ value, label }) => (
+                  <StatCard key={label} value={value} label={label} />
+                ))}
+              </div>
+            </>
+          ) : (
+            <p className="psd-no-game">No recent game data</p>
+          )}
+        </div>
+
       </div>
     </div>
   );
 }
 
-function StatCard({ value, label, highlight = {} }) {
+function StatCard({ value, label, highlightClass = '' }) {
   return (
-    <div className="border rounded p-2 text-center" style={{ fontSize: '13px', ...highlight }}>
-      <p className="fw-500 mb-0" style={{ fontSize: '13px', whiteSpace: 'nowrap' }}>{value ?? '-'}</p>
-      <p className="text-muted mb-0" style={{ fontSize: '10px', whiteSpace: 'nowrap' }}>{label}</p>
+    <div className={`stat-card ${highlightClass}`}>
+      <p className="stat-card__value">{value ?? '-'}</p>
+      <p className="stat-card__label">{label}</p>
     </div>
   );
 }
