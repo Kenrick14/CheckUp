@@ -22,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -47,6 +48,12 @@ public class BallDontLieServiceImpl implements BallDontLieService {
     private GameRepository gameRepository;
     @Autowired
     private PlayerStatsRepository playerStatsRepository;
+
+    private String year = String.valueOf(
+            LocalDate.now().getMonthValue() > 9
+                    ? LocalDate.now().getYear()
+                    : LocalDate.now().getYear() - 1
+    );
 
     public List<TeamDto> getAllTeams() {
         String url = ballDontLieConfig.getBaseUrl() + "/teams";
@@ -106,7 +113,7 @@ public class BallDontLieServiceImpl implements BallDontLieService {
         Long cursor = null;
 
         do{
-            String url = ballDontLieConfig.getBaseUrl() + "/games?seasons[]=2025&per_page=100";
+            String url = ballDontLieConfig.getBaseUrl() + "/games?seasons[]=" + year + "&per_page=100";
             if(cursor != null){
                 url += "&cursor=" + cursor;
             }
@@ -151,7 +158,7 @@ public class BallDontLieServiceImpl implements BallDontLieService {
                 }
             }
 
-            String url = ballDontLieConfig.getBaseUrl() + "/stats?seasons[]=2025&per_page=100";
+            String url = ballDontLieConfig.getBaseUrl() + "/stats?seasons[]=" + year + "&per_page=100";
             if(cursor != null){
                 url += "&cursor=" + cursor;
             }

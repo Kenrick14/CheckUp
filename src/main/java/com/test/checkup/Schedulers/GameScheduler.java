@@ -29,6 +29,11 @@ public class GameScheduler {
     @Autowired
     private BallDontLieConfig ballDontLieConfig;
 
+    private String year = String.valueOf(
+            LocalDate.now().getMonthValue() > 9
+                    ? LocalDate.now().getYear()
+                    : LocalDate.now().getYear() - 1
+    );
 
     @Scheduled(cron = "0 7 2 * * *")
     public void fetchYesterdaysGames() {
@@ -36,7 +41,7 @@ public class GameScheduler {
         System.out.println("Fetching games for: " + yesterday);
 
         String url = ballDontLieConfig.getBaseUrl()
-                + "/games?seasons[]=2025&dates[]=" + yesterday + "&per_page=100";
+                + "/games?seasons[]=" + year +"&dates[]=" + yesterday + "&per_page=100";
 
         ResponseEntity<ApiResponse<Game>> response = restTemplate.exchange(
                 url,
