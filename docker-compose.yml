@@ -1,0 +1,30 @@
+services:
+  backend:
+    build: ./backend
+    container_name: checkup-backend
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/checkup
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=KyrieIrving11
+    depends_on:
+      - db
+
+  frontend:
+    build: ./frontend
+    container_name: checkup-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+  db:
+    image: postgres:15
+    container_name: checkup-db
+    environment:
+      POSTGRES_DB: checkup
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: KyrieIrving11
+    ports:
+      - "5432:5432"
